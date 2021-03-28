@@ -1,0 +1,32 @@
+{
+    "name": "ipejasinovic/swoole-universal-pool",
+    "type": "library",
+    "description": "Universal DB Pool for Swoole",
+    "keywords": ["swoole", "pdo", "postgres", "mysql"],
+    "require": {
+        "php": ">=7.1",
+        "ext-swoole": ">=4.0.3",
+        "ext-swoole_postgresql": ">=4.0.3",
+        "ext-pdo_mysql": "*"
+    },
+    "authors": [
+        {
+            "name": "Igor Pejašinović",
+            "email": "ipejasinovic@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Swoole\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SwooleTest\\": "tests"
+        }
+    },
+    "require-dev": {
+        "swoole/ide-helper": "@dev",
+        "phpunit/phpunit": "^7.5"
+    }
+}
