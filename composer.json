@@ -2,12 +2,11 @@
     "name": "ipejasinovic/swoole-universal-pool",
     "type": "library",
     "description": "Universal DB Pool for Swoole",
-    "keywords": ["swoole", "pdo", "postgres", "mysql"],
+    "keywords": ["swoole", "postgres", "mysql", "pool"],
     "require": {
         "php": ">=7.1",
         "ext-swoole": ">=4.0.3",
-        "ext-swoole_postgresql": ">=4.0.3",
-        "ext-pdo_mysql": "*"
+        "ext-swoole_postgresql": ">=4.0.3"
     },
     "authors": [
         {
