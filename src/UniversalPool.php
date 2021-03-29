@@ -14,11 +14,7 @@ class UniversalPool {
 
     public function __construct(UniversalConfig $config, int $size = self::DEFAULT_SIZE) {
         $this->pool = new ConnectionPool(function () use($config) {
-            if ($config->getDriver() === 'mysql') {
-                $conn = new \Swoole\MySQLConnection();
-            } else if ($config->getDriver() === 'pgsql') {
-                $conn = new \Swoole\PostgresConnection();
-            } else if ($config->getDriver() === 'redis') {
+            if ($config->getDriver() === 'redis') {
                 $redis = new \Swoole\Coroutine\Redis();
                 $arguments = [
                     $config->getHost(),
@@ -42,6 +38,11 @@ class UniversalPool {
                     $redis->select($config->getDbIndex());
                 }
                 return $redis;
+            }
+            if ($config->getDriver() === 'mysql') {
+                $conn = new \Swoole\MySQLConnection();
+            } else if ($config->getDriver() === 'pgsql') {
+                $conn = new \Swoole\PostgresConnection();
             } else {
                 return false;
             }
@@ -51,31 +52,31 @@ class UniversalPool {
     }
 
     public function get() {
-        if(!$this->pool) {
+        if (!$this->pool) {
             return false;
         }
         return $this->pool->get();
     }
 
     public function put($connection) {
-        if(!$this->pool) {
+        if (!$this->pool) {
             return false;
         }
         return $this->pool->put($connection);
     }
 
     public function close() {
-        if(!$this->pool) {
+        if (!$this->pool) {
             return false;
         }
         return $this->pool->close();
     }
 
     public function fill() {
-        if(!$this->pool) {
+        if (!$this->pool) {
             return false;
         }
-        return $this->pool->close();
+        return $this->pool->fill();
     }
 
 }
