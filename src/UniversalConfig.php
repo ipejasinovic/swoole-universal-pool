@@ -8,6 +8,7 @@ class UniversalConfig {
 
     public const DRIVER_MYSQL = 'mysql';
     public const DRIVER_PGSQL = 'pgsql';
+    public const DRIVER_REDIS = 'redis';
 
     protected $driver = self::DRIVER_MYSQL;
     protected $host = '127.0.0.1';
@@ -18,6 +19,12 @@ class UniversalConfig {
     protected $username = 'root';
     protected $password = 'root';
     protected $options = [];
+    protected $timeout = 0.0;
+    protected $reserved = '';
+    protected $retry_interval = 0;
+    protected $read_timeout = 0.0;
+    protected $auth = '';
+    protected $dbIndex = 0;
 
     public function getDriver(): string {
         return $this->driver;
@@ -104,10 +111,65 @@ class UniversalConfig {
         return $this;
     }
 
+    public function getTimeout(): float {
+        return $this->timeout;
+    }
+
+    public function withTimeout(float $timeout): self {
+        $this->timeout = $timeout;
+        return $this;
+    }
+
+    public function getReserved(): string {
+        return $this->reserved;
+    }
+
+    public function withReserved(string $reserved): self {
+        $this->reserved = $reserved;
+        return $this;
+    }
+
+    public function getRetryInterval(): int {
+        return $this->retry_interval;
+    }
+
+    public function withRetryInterval(int $retry_interval): self {
+        $this->retry_interval = $retry_interval;
+        return $this;
+    }
+
+    public function getReadTimeout(): float {
+        return $this->read_timeout;
+    }
+
+    public function withReadTimeout(float $read_timeout): self {
+        $this->read_timeout = $read_timeout;
+        return $this;
+    }
+
+    public function getAuth(): string {
+        return $this->auth;
+    }
+
+    public function withAuth(string $auth): self {
+        $this->auth = $auth;
+        return $this;
+    }
+
+    public function getDbIndex(): int {
+        return $this->dbIndex;
+    }
+
+    public function withDbIndex(int $dbIndex): self {
+        $this->dbIndex = $dbIndex;
+        return $this;
+    }
+
     public static function getAvailableDrivers() {
         return [
             self::DRIVER_MYSQL,
-            self::DRIVER_PGSQL
+            self::DRIVER_PGSQL,
+            self::DRIVER_REDIS
         ];
     }
 

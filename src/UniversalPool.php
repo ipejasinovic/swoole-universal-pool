@@ -18,6 +18,30 @@ class UniversalPool {
                 $conn = new \Swoole\MySQLConnection();
             } else if ($config->getDriver() === 'pgsql') {
                 $conn = new \Swoole\PostgresConnection();
+            } else if ($config->getDriver() === 'redis') {
+                $redis = new \Redis();
+                $arguments = [
+                    $config->getHost(),
+                    $config->getPort(),
+                ];
+                if ($config->getTimeout() !== 0.0) {
+                    $arguments[] = $config->getTimeout();
+                }
+                if ($config->getRetryInterval() !== 0) {
+                    $arguments[] = null;
+                    $arguments[] = $config->getRetryInterval();
+                }
+                if ($config->getReadTimeout() !== 0.0) {
+                    $arguments[] = $config->getReadTimeout();
+                }
+                $redis->connect(...$arguments);
+                if ($config->getAuth()) {
+                    $redis->auth($config->getAuth());
+                }
+                if ($config->getDbIndex() !== 0) {
+                    $redis->select($config->getDbIndex());
+                }
+                return $redis;
             } else {
                 return false;
             }
