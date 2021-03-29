@@ -19,7 +19,7 @@ class UniversalPool {
             } else if ($config->getDriver() === 'pgsql') {
                 $conn = new \Swoole\PostgresConnection();
             } else if ($config->getDriver() === 'redis') {
-                $redis = new \Redis();
+                $redis = new \Swoole\Coroutine\Redis();
                 $arguments = [
                     $config->getHost(),
                     $config->getPort(),
