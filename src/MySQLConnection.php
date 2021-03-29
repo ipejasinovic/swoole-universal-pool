@@ -36,7 +36,6 @@ class MySQLConnection implements ConnectionInterface {
             'password' => $this->config->getPassword(),
             'database' => $this->config->getDbname(),
             'port' => $this->config->getPort() . '',
-            'timeout' => 10,
             'charset' => $this->config->getCharset(),
             'strict_type' => false,
             'fetch_mode' => true
