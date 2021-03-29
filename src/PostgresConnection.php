@@ -22,12 +22,12 @@ class PostgresConnection implements ConnectionInterface {
             $this->config = $config;
         } else {
             $this->config = (new UniversalConfig)
-                    ->withDriver('pgsql')
-                    ->withHost('127.0.0.1')
-                    ->withPort(5432)
-                    ->withDbName('admin')
-                    ->withUsername('admin')
-                    ->withPassword('admin');
+                ->withDriver('pgsql')
+                ->withHost('127.0.0.1')
+                ->withPort(5432)
+                ->withDbName('admin')
+                ->withUsername('admin')
+                ->withPassword('admin');
         }
         $this->conn = new PostgreSQL();
     }
