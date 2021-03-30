@@ -6,9 +6,10 @@ Swoole\Runtime::enableCoroutine();
 
 $dbConfig = (new Swoole\UniversalConfig)
         ->withDriver('redis')
-        ->withHost('127.0.01')
+        ->withHost('127.0.0.1')
         ->withPort(6379)
-        ->withAuth('admin');
+        ->withAuth('admin')
+        ->withReadTimeout(-1);
 
 $dbPool = new Swoole\UniversalPool($dbConfig, 2);
 

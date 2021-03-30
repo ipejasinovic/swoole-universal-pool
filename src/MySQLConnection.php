@@ -37,6 +37,7 @@ class MySQLConnection implements ConnectionInterface {
             'database' => $this->config->getDbname(),
             'port' => $this->config->getPort() . '',
             'charset' => $this->config->getCharset(),
+            'timeout' => -1,
             'strict_type' => false,
             'fetch_mode' => true
         ]);
@@ -45,6 +46,9 @@ class MySQLConnection implements ConnectionInterface {
     }
 
     public function begin() {
+        if(!$this->conn->connected) {
+            $this->connect($this->config);
+        }
         $this->resource = $this->conn->begin();
         $this->error = $this->conn->error;
         $this->affected_rows = 0;
@@ -55,6 +59,9 @@ class MySQLConnection implements ConnectionInterface {
     }
 
     public function commit() {
+        if(!$this->conn->connected) {
+            $this->connect($this->config);
+        }
         $this->resource = $this->conn->commit();
         $this->error = $this->conn->error;
         $this->affected_rows = 0;
@@ -65,6 +72,9 @@ class MySQLConnection implements ConnectionInterface {
     }
 
     public function query($sql) {
+        if(!$this->conn->connected) {
+            $this->connect($this->config);
+        }
         $this->resource = $this->conn->query($sql);
         $this->error = $this->conn->error;
         $this->affected_rows = $this->conn->affected_rows;
