@@ -50,6 +50,9 @@ class MySQLConnection implements ConnectionInterface {
             $this->connect($this->config);
         }
         $this->resource = $this->conn->begin();
+        if(!$this->resource) {
+            $this->resource = $this->conn->begin();
+        }
         $this->error = $this->conn->error;
         $this->affected_rows = 0;
         if(!$this->resource) {
@@ -63,6 +66,9 @@ class MySQLConnection implements ConnectionInterface {
             $this->connect($this->config);
         }
         $this->resource = $this->conn->commit();
+        if(!$this->resource) {
+            $this->resource = $this->conn->commit();
+        }
         $this->error = $this->conn->error;
         $this->affected_rows = 0;
         if(!$this->resource) {
@@ -76,6 +82,9 @@ class MySQLConnection implements ConnectionInterface {
             $this->connect($this->config);
         }
         $this->resource = $this->conn->query($sql);
+        if(!$this->resource) {
+            $this->resource = $this->conn->query();
+        }
         $this->error = $this->conn->error;
         $this->affected_rows = $this->conn->affected_rows;
         if(!$this->resource) {
