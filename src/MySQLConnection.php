@@ -83,7 +83,7 @@ class MySQLConnection implements ConnectionInterface {
         }
         $this->resource = $this->conn->query($sql);
         if(!$this->resource) {
-            $this->resource = $this->conn->query();
+            $this->resource = $this->conn->query($sql);
         }
         $this->error = $this->conn->error;
         $this->affected_rows = $this->conn->affected_rows;
