@@ -2,7 +2,7 @@
     "name": "ipejasinovic/swoole-universal-pool",
     "type": "library",
     "description": "Universal DB Pool for Swoole",
-    "keywords": ["swoole", "postgres", "mysql", "pool"],
+    "keywords": ["swoole", "postgres", "mysql", "pool", "redis"],
     "require": {
         "php": ">=7.1",
         "ext-swoole": ">=4.0.3",
