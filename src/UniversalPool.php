@@ -9,7 +9,7 @@ use Swoole\UniversalConfig;
 
 class UniversalPool {
 
-    protected $size = 64;
+    public const DEFAULT_SIZE = 64;
     protected $pool = false;
 
     public function __construct(UniversalConfig $config, int $size = self::DEFAULT_SIZE) {
