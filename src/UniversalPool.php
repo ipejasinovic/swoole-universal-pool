@@ -67,7 +67,7 @@ class UniversalPool {
     }
 
     private function getRedisConnection(&$config) {
-        $redis = new \Swoole\Coroutine\Redis();
+        $redis = new \Redis();
         $arguments = [$config->getHost(), $config->getPort()];
         if ($config->getTimeout() !== 0.0) {
             $arguments[] = $config->getTimeout();
