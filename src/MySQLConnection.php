@@ -15,7 +15,8 @@ class MySQLConnection implements ConnectionInterface {
     public $errno;
     public $connect_error;
     public $connect_errno;
-    public $affected_rows;
+    public $affected_rows = 0;
+    public $insert_id = 0;
 
     public function __construct($config = null) {
         if ($config) {
@@ -46,68 +47,79 @@ class MySQLConnection implements ConnectionInterface {
     }
 
     public function begin() {
-        if(!$this->conn->connected) {
+        if (!$this->conn->connected) {
             $this->connect($this->config);
         }
         $this->resource = $this->conn->begin();
-        if(!$this->resource) {
+        if (!$this->resource) {
             $this->connect($this->config);
             $this->resource = $this->conn->begin();
         }
         $this->error = $this->conn->error;
         $this->affected_rows = 0;
-        if(!$this->resource) {
+        $this->insert_id = 0;
+        if (!$this->resource) {
             return false;
         }
         return $this;
     }
 
     public function commit() {
-        if(!$this->conn->connected) {
+        if (!$this->conn->connected) {
             $this->connect($this->config);
         }
         $this->resource = $this->conn->commit();
-        if(!$this->resource) {
+        if (!$this->resource) {
             $this->connect($this->config);
             $this->resource = $this->conn->commit();
         }
         $this->error = $this->conn->error;
         $this->affected_rows = 0;
-        if(!$this->resource) {
+        $this->insert_id = 0;
+        if (!$this->resource) {
             return false;
         }
         return $this;
     }
 
     public function query($sql) {
-        if(!$this->conn->connected) {
+        if (!$this->conn->connected) {
             $this->connect($this->config);
         }
         $this->resource = $this->conn->query($sql);
-        if(!$this->resource) {
+        if (!$this->resource) {
             $this->connect($this->config);
             $this->resource = $this->conn->query($sql);
         }
         $this->error = $this->conn->error;
         $this->affected_rows = $this->conn->affected_rows;
-        if(!$this->resource) {
+        $this->insert_id = $this->conn->insert_id;
+        if (!$this->resource) {
             return false;
         }
         return $this;
     }
 
     public function fetch($mode = null) {
-        if(!$this->resource) {
+        if (!$this->resource) {
             return false;
         }
         return $this->conn->fetch();
     }
 
     public function fetchAll($mode = null) {
-        if(!$this->resource) {
+        if (!$this->resource) {
             return false;
         }
         return $this->conn->fetchAll();
+    }
+
+    public function lastInsertId() {
+        return $this->insert_id;
+    }
+
+    public function rowCount() {
+        return $this->affected_rows;
     }
 
 }
