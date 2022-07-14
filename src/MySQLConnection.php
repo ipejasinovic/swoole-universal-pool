@@ -86,7 +86,11 @@ class MySQLConnection implements ConnectionInterface {
         if (!$this->conn->connected) {
             $this->connect($this->config);
         }
-        $this->resource = $this->conn->query($sql);
+        try {
+            $this->resource = $this->conn->query($sql);
+        } catch (Exception $ex) {
+            return false;
+        }
         if (!$this->resource) {
             $this->connect($this->config);
             $this->resource = $this->conn->query($sql);
