@@ -106,14 +106,14 @@ class MySQLConnection implements ConnectionInterface {
         return $this;
     }
 
-    public function fetch($mode = null) {
+    public function fetch($mode = PDO::FETCH_DEFAULT) {
         if (!$this->resource) {
             return false;
         }
         return $this->resource->fetch($mode);
     }
 
-    public function fetchAll($mode = null) {
+    public function fetchAll($mode = PDO::FETCH_DEFAULT) {
         if (!$this->resource) {
             return false;
         }
