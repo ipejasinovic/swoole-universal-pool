@@ -4,9 +4,8 @@
     "description": "Universal DB Pool for Swoole",
     "keywords": ["swoole", "postgres", "mysql", "pool", "redis"],
     "require": {
-        "php": ">=7.1",
-        "ext-swoole": ">=4.0.3",
-        "ext-swoole_postgresql": ">=4.0.3"
+        "php": ">=8.0",
+        "ext-swoole": ">=5.0"
     },
     "authors": [
         {
@@ -25,7 +24,7 @@
         }
     },
     "require-dev": {
-        "swoole/ide-helper": "@dev",
+        "swoole/ide-helper": ">=5.0",
         "phpunit/phpunit": "^7.5"
     }
 }
