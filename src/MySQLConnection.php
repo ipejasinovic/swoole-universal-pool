@@ -2,7 +2,7 @@
 
 namespace Swoole;
 
-use Swoole\Coroutine\MySQL;
+use PDO;
 use Swoole\UniversalConfig;
 
 class MySQLConnection implements ConnectionInterface {
@@ -24,83 +24,85 @@ class MySQLConnection implements ConnectionInterface {
         } else {
             $this->config = new UniversalConfig();
         }
-        $this->conn = new MySQL();
     }
 
     public function connect($config = null) {
         if ($config) {
             $this->config = $config;
         }
-        $this->connected = $this->conn->connect([
-            'host' => $this->config->getHost(),
-            'user' => $this->config->getUsername(),
-            'password' => $this->config->getPassword(),
-            'database' => $this->config->getDbname(),
-            'port' => $this->config->getPort() . '',
-            'charset' => $this->config->getCharset(),
-            'timeout' => -1,
-            'strict_type' => false,
-            'fetch_mode' => true
-        ]);
-        $this->connect_error = $this->conn->error;
+        try {
+            $this->conn = new PDO(
+                    "{$this->config->getDriver()}:" .
+                    (
+                    $this->config->hasUnixSocket() ?
+                    "unix_socket={$this->config->getUnixSocket()};" :
+                    "host={$this->config->getHost()};" . "port={$this->config->getPort()};"
+                    ) .
+                    "dbname={$this->config->getDbname()};" .
+                    "charset={$this->config->getCharset()}",
+                    $this->config->getUsername(),
+                    $this->config->getPassword(),
+                    $this->config->getOptions()
+            );
+            $this->connected = true;
+        } catch (PDOException $ex) {
+            $this->connect_error = $this->conn->connect_error;
+            $this->connected = false;
+        }
         return $this->connected;
     }
 
     public function begin() {
-        if (!$this->conn->connected) {
+        if (!$this->connected) {
             $this->connect($this->config);
         }
-        $this->resource = $this->conn->begin();
-        if (!$this->resource) {
-            $this->connect($this->config);
-            $this->resource = $this->conn->begin();
-        }
-        $this->error = $this->conn->error;
         $this->affected_rows = 0;
         $this->insert_id = 0;
-        if (!$this->resource) {
+        try {
+            $this->conn->beginTransaction();
+        } catch (PDOException $ex) {
+            $this->error = $ex->getMessage();
+            $this->errno = $ex->getCode();
             return false;
         }
+        $this->error = '';
+        $this->errno = null;
         return $this;
     }
 
     public function commit() {
-        if (!$this->conn->connected) {
+        if (!$this->connected) {
             $this->connect($this->config);
         }
-        $this->resource = $this->conn->commit();
-        if (!$this->resource) {
-            $this->connect($this->config);
-            $this->resource = $this->conn->commit();
-        }
-        $this->error = $this->conn->error;
         $this->affected_rows = 0;
         $this->insert_id = 0;
-        if (!$this->resource) {
+        try {
+            $this->conn->commit();
+        } catch (PDOException $ex) {
+            $this->error = $ex->getMessage();
+            $this->errno = $ex->getCode();
             return false;
         }
+        $this->error = '';
+        $this->errno = null;
         return $this;
     }
 
     public function query($sql) {
-        if (!$this->conn->connected) {
+        if (!$this->connected) {
             $this->connect($this->config);
         }
         try {
             $this->resource = $this->conn->query($sql);
-        } catch (Exception $ex) {
+        } catch (PDOException $ex) {
+            $this->error = $ex->getMessage();
+            $this->errno = $ex->getCode();
             return false;
         }
-        if (!$this->resource) {
-            $this->connect($this->config);
-            $this->resource = $this->conn->query($sql);
-        }
-        $this->error = $this->conn->error;
-        $this->affected_rows = $this->conn->affected_rows;
-        $this->insert_id = $this->conn->insert_id;
-        if (!$this->resource) {
-            return false;
-        }
+        $this->error = '';
+        $this->errno = null;
+        $this->affected_rows = $this->resource->rowCount();
+        $this->insert_id = $this->resource->lastInsertId();
         return $this;
     }
 
@@ -108,14 +110,14 @@ class MySQLConnection implements ConnectionInterface {
         if (!$this->resource) {
             return false;
         }
-        return $this->conn->fetch();
+        return $this->resource->fetch($mode);
     }
 
     public function fetchAll($mode = null) {
         if (!$this->resource) {
             return false;
         }
-        return $this->conn->fetchAll();
+        return $this->resource->fetchAll($mode);
     }
 
     public function lastInsertId() {
