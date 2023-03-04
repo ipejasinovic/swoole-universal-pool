@@ -102,7 +102,7 @@ class MySQLConnection implements ConnectionInterface {
         $this->error = '';
         $this->errno = null;
         $this->affected_rows = $this->resource->rowCount();
-        $this->insert_id = $this->resource->lastInsertId();
+        $this->insert_id = $this->conn->lastInsertId();
         return $this;
     }
 
