@@ -45,7 +45,12 @@ class MySQLConnection implements ConnectionInterface {
                     $this->config->getOptions()
             );
             $this->connected = true;
-        } catch (PDOException $ex) {
+        } catch (\Exception $ex) {
+            echo "Exception" . PHP_EOL;
+            $this->connect_error = $this->conn->connect_error;
+            $this->connected = false;
+        } catch (\PDOException $ex) {
+            echo "PDOException" . PHP_EOL;
             $this->connect_error = $this->conn->connect_error;
             $this->connected = false;
         }
@@ -60,7 +65,14 @@ class MySQLConnection implements ConnectionInterface {
         $this->insert_id = 0;
         try {
             $this->conn->beginTransaction();
-        } catch (PDOException $ex) {
+        } catch (\Exception $ex) {
+            echo "Exception" . PHP_EOL;
+            $this->error = $ex->getMessage();
+            $this->errno = $ex->getCode();
+            $this->connected = false;
+            return $retry ? false : $this->begin(true);
+        } catch (\PDOException $ex) {
+            echo "PDOException" . PHP_EOL;
             $this->error = $ex->getMessage();
             $this->errno = $ex->getCode();
             $this->connected = false;
@@ -79,7 +91,14 @@ class MySQLConnection implements ConnectionInterface {
         $this->insert_id = 0;
         try {
             $this->conn->commit();
-        } catch (PDOException $ex) {
+        } catch (\Exception $ex) {
+            echo "Exception" . PHP_EOL;
+            $this->error = $ex->getMessage();
+            $this->errno = $ex->getCode();
+            $this->connected = false;
+            return $retry ? false : $this->commit(true);
+        } catch (\PDOException $ex) {
+            echo "PDOException" . PHP_EOL;
             $this->error = $ex->getMessage();
             $this->errno = $ex->getCode();
             $this->connected = false;
@@ -96,7 +115,14 @@ class MySQLConnection implements ConnectionInterface {
         }
         try {
             $this->resource = $this->conn->query($sql);
-        } catch (PDOException $ex) {
+        } catch (\Exception $ex) {
+            echo "Exception" . PHP_EOL;
+            $this->error = $ex->getMessage();
+            $this->errno = $ex->getCode();
+            $this->connected = false;
+            return $retry ? false : $this->query($sql, true);
+        } catch (\PDOException $ex) {
+            echo "PDOException" . PHP_EOL;
             $this->error = $ex->getMessage();
             $this->errno = $ex->getCode();
             $this->connected = false;
