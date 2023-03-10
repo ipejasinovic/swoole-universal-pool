@@ -99,6 +99,7 @@ class MySQLConnection implements ConnectionInterface {
         } catch (PDOException $ex) {
             $this->error = $ex->getMessage();
             $this->errno = $ex->getCode();
+            $this->connected = false;
             return $retry ? false : $this->query($sql, true);
         }
         $this->error = '';
