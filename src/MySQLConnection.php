@@ -52,7 +52,7 @@ class MySQLConnection implements ConnectionInterface {
         return $this->connected;
     }
 
-    public function begin() {
+    public function begin($retry = false) {
         if (!$this->connected) {
             $this->connect($this->config);
         }
@@ -63,14 +63,15 @@ class MySQLConnection implements ConnectionInterface {
         } catch (PDOException $ex) {
             $this->error = $ex->getMessage();
             $this->errno = $ex->getCode();
-            return false;
+            $this->connected = false;
+            return $retry ? false : $this->begin(true);
         }
         $this->error = '';
         $this->errno = null;
         return $this;
     }
 
-    public function commit() {
+    public function commit($retry = false) {
         if (!$this->connected) {
             $this->connect($this->config);
         }
@@ -81,14 +82,15 @@ class MySQLConnection implements ConnectionInterface {
         } catch (PDOException $ex) {
             $this->error = $ex->getMessage();
             $this->errno = $ex->getCode();
-            return false;
+            $this->connected = false;
+            return $retry ? false : $this->commit(true);
         }
         $this->error = '';
         $this->errno = null;
         return $this;
     }
 
-    public function query($sql) {
+    public function query($sql, $retry = false) {
         if (!$this->connected) {
             $this->connect($this->config);
         }
@@ -97,7 +99,7 @@ class MySQLConnection implements ConnectionInterface {
         } catch (PDOException $ex) {
             $this->error = $ex->getMessage();
             $this->errno = $ex->getCode();
-            return false;
+            return $retry ? false : $this->query($sql, true);
         }
         $this->error = '';
         $this->errno = null;
