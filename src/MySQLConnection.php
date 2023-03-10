@@ -3,20 +3,16 @@
 namespace Swoole;
 
 use PDO;
-use Swoole\UniversalConfig;
+use Exception;
+use PDOException;
 
-class MySQLConnection implements ConnectionInterface {
+final class MySQLConnection implements ConnectionInterface {
 
     private $config;
     private $conn;
     private $resource;
-    public $connected;
-    public $error;
-    public $errno;
-    public $connect_error;
-    public $connect_errno;
-    public $affected_rows = 0;
-    public $insert_id = 0;
+
+    const RETRY_ATTEMPTS = 1;
 
     public function __construct($config = null) {
         if ($config) {
@@ -27,6 +23,7 @@ class MySQLConnection implements ConnectionInterface {
     }
 
     public function connect($config = null) {
+        $this->conn = null;
         if ($config) {
             $this->config = $config;
         }
@@ -44,117 +41,40 @@ class MySQLConnection implements ConnectionInterface {
                     $this->config->getPassword(),
                     $this->config->getOptions()
             );
-            $this->connected = true;
-        } catch (\Exception $ex) {
-            echo "Exception" . PHP_EOL;
-            $this->connect_error = $this->conn->connect_error;
-            $this->connected = false;
-        } catch (\PDOException $ex) {
-            echo "PDOException" . PHP_EOL;
-            $this->connect_error = $this->conn->connect_error;
-            $this->connected = false;
+        } catch (Exception $ex) {
+            throw $ex;
+        } catch (PDOException $ex) {
+            throw $ex;
         }
-        return $this->connected;
     }
 
-    public function begin($retry = false) {
-        if (!$this->connected) {
-            $this->connect($this->config);
-        }
-        $this->affected_rows = 0;
-        $this->insert_id = 0;
-        try {
-            $this->conn->beginTransaction();
-        } catch (\Exception $ex) {
-            echo "Exception" . PHP_EOL;
-            $this->error = $ex->getMessage();
-            $this->errno = $ex->getCode();
-            $this->connected = false;
-            return $retry ? false : $this->begin(true);
-        } catch (\PDOException $ex) {
-            echo "PDOException" . PHP_EOL;
-            $this->error = $ex->getMessage();
-            $this->errno = $ex->getCode();
-            $this->connected = false;
-            return $retry ? false : $this->begin(true);
-        }
-        $this->error = '';
-        $this->errno = null;
-        return $this;
-    }
-
-    public function commit($retry = false) {
-        if (!$this->connected) {
-            $this->connect($this->config);
-        }
-        $this->affected_rows = 0;
-        $this->insert_id = 0;
-        try {
-            $this->conn->commit();
-        } catch (\Exception $ex) {
-            echo "Exception" . PHP_EOL;
-            $this->error = $ex->getMessage();
-            $this->errno = $ex->getCode();
-            $this->connected = false;
-            return $retry ? false : $this->commit(true);
-        } catch (\PDOException $ex) {
-            echo "PDOException" . PHP_EOL;
-            $this->error = $ex->getMessage();
-            $this->errno = $ex->getCode();
-            $this->connected = false;
-            return $retry ? false : $this->commit(true);
-        }
-        $this->error = '';
-        $this->errno = null;
-        return $this;
-    }
-
-    public function query($sql, $retry = false) {
-        if (!$this->connected) {
-            $this->connect($this->config);
-        }
-        try {
-            $this->resource = $this->conn->query($sql);
-        } catch (\Exception $ex) {
-            echo "Exception" . PHP_EOL;
-            $this->error = $ex->getMessage();
-            $this->errno = $ex->getCode();
-            $this->connected = false;
-            return $retry ? false : $this->query($sql, true);
-        } catch (\PDOException $ex) {
-            echo "PDOException" . PHP_EOL;
-            $this->error = $ex->getMessage();
-            $this->errno = $ex->getCode();
-            $this->connected = false;
-            return $retry ? false : $this->query($sql, true);
-        }
-        $this->error = '';
-        $this->errno = null;
-        $this->affected_rows = $this->resource->rowCount();
-        $this->insert_id = $this->conn->lastInsertId();
-        return $this;
-    }
-
-    public function fetch($mode = PDO::FETCH_DEFAULT) {
-        if (!$this->resource) {
-            return false;
-        }
-        return $this->resource->fetch($mode);
-    }
-
-    public function fetchAll($mode = PDO::FETCH_DEFAULT) {
-        if (!$this->resource) {
-            return false;
-        }
-        return $this->resource->fetchAll($mode);
-    }
-
-    public function lastInsertId() {
-        return $this->insert_id;
-    }
-
-    public function rowCount() {
-        return $this->affected_rows;
+    public function __call($method, $args) {
+        $retry_attempt = 0;
+        do {
+            try {
+                if (is_callable(array($this->conn, $method))) {
+                    $this->resource = call_user_func_array(array($this->conn, $method), $args);
+                    return $this->resource;
+                } else if (is_callable(array($this->resource, $method))) {
+                    return call_user_func_array(array($this->resource, $method), $args);
+                } else {
+                    throw new Exception("Call to undefined method '{$method}'");
+                }
+            } catch (Exception $ex) {
+                if (strpos($ex->getMessage(), 'server has gone away') !== false) {
+                    ++$retry_attempt;
+                } else {
+                    throw $ex;
+                }
+            } catch (PDOException $ex) {
+                if (strpos($ex->getMessage(), 'server has gone away') !== false) {
+                    ++$retry_attempt;
+                } else {
+                    throw $ex;
+                }
+            }
+            $this->connect();
+        } while ($retry_attempt <= self::RETRY_ATTEMPTS);
     }
 
 }
