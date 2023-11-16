@@ -25,152 +25,161 @@ class UniversalConfig {
     protected $read_timeout = 0.0;
     protected $auth = '';
     protected $dbIndex = 0;
+    protected $retry_number = 1;
 
     public function getDriver(): string {
-        return $this->driver;
+	return $this->driver;
     }
 
     public function withDriver(string $driver): self {
-        $this->driver = $driver;
-        return $this;
+	$this->driver = $driver;
+	return $this;
     }
 
     public function getHost(): string {
-        return $this->host;
+	return $this->host;
     }
 
     public function withHost($host): self {
-        $this->host = $host;
-        return $this;
+	$this->host = $host;
+	return $this;
     }
 
     public function getPort(): int {
-        return $this->port;
+	return $this->port;
     }
 
     public function hasUnixSocket(): bool {
-        return isset($this->unixSocket);
+	return isset($this->unixSocket);
     }
 
     public function getUnixSocket(): string {
-        return $this->unixSocket;
+	return $this->unixSocket;
     }
 
     public function withUnixSocket(?string $unixSocket): self {
-        $this->unixSocket = $unixSocket;
-        return $this;
+	$this->unixSocket = $unixSocket;
+	return $this;
     }
 
     public function withPort(int $port): self {
-        $this->port = $port;
-        return $this;
+	$this->port = $port;
+	return $this;
     }
 
     public function getDbname(): string {
-        return $this->dbname;
+	return $this->dbname;
     }
 
     public function withDbname(string $dbname): self {
-        $this->dbname = $dbname;
-        return $this;
+	$this->dbname = $dbname;
+	return $this;
     }
 
     public function getCharset(): string {
-        return $this->charset;
+	return $this->charset;
     }
 
     public function withCharset(string $charset): self {
-        $this->charset = $charset;
-        return $this;
+	$this->charset = $charset;
+	return $this;
     }
 
     public function getUsername(): string {
-        return $this->username;
+	return $this->username;
     }
 
     public function withUsername(string $username): self {
-        $this->username = $username;
-        return $this;
+	$this->username = $username;
+	return $this;
     }
 
     public function getPassword(): string {
-        return $this->password;
+	return $this->password;
     }
 
     public function withPassword(string $password): self {
-        $this->password = $password;
-        return $this;
+	$this->password = $password;
+	return $this;
     }
 
     public function getOptions(): array {
-        return $this->options;
+	return $this->options;
     }
 
     public function withOptions(array $options): self {
-        $this->options = $options;
-        return $this;
+	$this->options = $options;
+	return $this;
     }
 
     public function getTimeout(): float {
-        return $this->timeout;
+	return $this->timeout;
     }
 
     public function withTimeout(float $timeout): self {
-        $this->timeout = $timeout;
-        return $this;
+	$this->timeout = $timeout;
+	return $this;
     }
 
     public function getReserved(): string {
-        return $this->reserved;
+	return $this->reserved;
     }
 
     public function withReserved(string $reserved): self {
-        $this->reserved = $reserved;
-        return $this;
+	$this->reserved = $reserved;
+	return $this;
     }
 
     public function getRetryInterval(): int {
-        return $this->retry_interval;
+	return $this->retry_interval;
     }
 
     public function withRetryInterval(int $retry_interval): self {
-        $this->retry_interval = $retry_interval;
-        return $this;
+	$this->retry_interval = $retry_interval;
+	return $this;
     }
 
     public function getReadTimeout(): float {
-        return $this->read_timeout;
+	return $this->read_timeout;
     }
 
     public function withReadTimeout(float $read_timeout): self {
-        $this->read_timeout = $read_timeout;
-        return $this;
+	$this->read_timeout = $read_timeout;
+	return $this;
     }
 
     public function getAuth(): string {
-        return $this->auth;
+	return $this->auth;
     }
 
     public function withAuth(string $auth): self {
-        $this->auth = $auth;
-        return $this;
+	$this->auth = $auth;
+	return $this;
+    }
+
+    public function getRetryNumber(): string {
+	return $this->retry_number;
+    }
+
+    public function withRetryNumber(int $retry_number): self {
+	$this->retry_number = $retry_number;
+	return $this;
     }
 
     public function getDbIndex(): int {
-        return $this->dbIndex;
+	return $this->dbIndex;
     }
 
     public function withDbIndex(int $dbIndex): self {
-        $this->dbIndex = $dbIndex;
-        return $this;
+	$this->dbIndex = $dbIndex;
+	return $this;
     }
 
     public static function getAvailableDrivers() {
-        return [
-            self::DRIVER_MYSQL,
-            self::DRIVER_PGSQL,
-            self::DRIVER_REDIS
-        ];
+	return [
+	    self::DRIVER_MYSQL,
+	    self::DRIVER_PGSQL,
+	    self::DRIVER_REDIS
+	];
     }
-
 }
