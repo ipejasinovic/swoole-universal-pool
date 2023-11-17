@@ -53,7 +53,7 @@ final class MySQLConnection implements ConnectionInterface {
 	    try {
 		if (is_callable(array($this->conn, $method))) {
 		    if (in_array($method, $this->methods_of_interest)) {
-			$this->conn->exec("SELECT 1;");
+			$this->conn->query("SELECT 1;")->fetchAll();
 		    }
 		    $this->resource = call_user_func_array(array($this->conn, $method), $args);
 		    return $this->resource;
