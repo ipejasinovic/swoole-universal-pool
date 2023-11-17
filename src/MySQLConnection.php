@@ -11,6 +11,7 @@ final class MySQLConnection implements ConnectionInterface {
     private $config;
     private $conn;
     private $resource;
+    private $methods_of_interest = ['prepare'];
 
     public function __construct($config = null) {
 	if ($config) {
@@ -51,6 +52,9 @@ final class MySQLConnection implements ConnectionInterface {
 	do {
 	    try {
 		if (is_callable(array($this->conn, $method))) {
+		    if (in_array($method, $this->methods_of_interest)) {
+			$this->conn->query("SELECT 1;");
+		    }
 		    $this->resource = call_user_func_array(array($this->conn, $method), $args);
 		    return $this->resource;
 		} else if (is_callable(array($this->resource, $method))) {
@@ -59,12 +63,14 @@ final class MySQLConnection implements ConnectionInterface {
 		    throw new Exception("Call to undefined method '{$method}'");
 		}
 	    } catch (Exception $ex) {
+		echo 'Exception: ' . $ex->getMessage() . PHP_EOL;
 		if (strpos($ex->getMessage(), 'server has gone away') !== false) {
 		    ++$retry_attempt;
 		} else {
 		    throw $ex;
 		}
 	    } catch (PDOException $ex) {
+		echo 'PDOException: ' . $ex->getMessage() . PHP_EOL;
 		if (strpos($ex->getMessage(), 'server has gone away') !== false) {
 		    ++$retry_attempt;
 		} else {
