@@ -25,7 +25,7 @@ class UniversalConfig {
     protected $read_timeout = 0.0;
     protected $auth = '';
     protected $dbIndex = 0;
-    protected $retry_number = 1;
+    public $retry_number = 1;
 
     public function getDriver(): string {
 	return $this->driver;
