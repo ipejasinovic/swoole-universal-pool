@@ -11,7 +11,7 @@ final class MySQLConnection implements ConnectionInterface {
     private $config;
     private $conn;
     private $resource;
-    private $methods_of_interest = ['prepare', 'query'];
+    private $methods_of_interest = ['prepare', 'query', 'exec'];
 
     public function __construct($config = null) {
 	if ($config) {
