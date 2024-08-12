@@ -28,17 +28,17 @@ final class MySQLConnection implements ConnectionInterface {
 	}
 	try {
 	    $this->conn = new PDO(
-		"{$this->config->getDriver()}:" .
-		(
-		$this->config->hasUnixSocket() ?
-		"unix_socket={$this->config->getUnixSocket()};" :
-		"host={$this->config->getHost()};" . "port={$this->config->getPort()};"
-		) .
-		"dbname={$this->config->getDbname()};" .
-		"charset={$this->config->getCharset()}",
-		$this->config->getUsername(),
-		$this->config->getPassword(),
-		$this->config->getOptions()
+		    "{$this->config->getDriver()}:" .
+		    (
+		    $this->config->hasUnixSocket() ?
+		    "unix_socket={$this->config->getUnixSocket()};" :
+		    "host={$this->config->getHost()};" . "port={$this->config->getPort()};"
+		    ) .
+		    "dbname={$this->config->getDbname()};" .
+		    "charset={$this->config->getCharset()}",
+		    $this->config->getUsername(),
+		    $this->config->getPassword(),
+		    $this->config->getOptions()
 	    );
 	} catch (Exception $ex) {
 	    throw $ex;
@@ -64,14 +64,14 @@ final class MySQLConnection implements ConnectionInterface {
 		}
 	    } catch (Exception $ex) {
 		echo 'Exception: ' . $ex->getMessage() . PHP_EOL;
-		if (strpos($ex->getMessage(), 'server has gone away') !== false) {
+		if (strpos($ex->getMessage(), 'server has gone away') !== false || strpos($ex->getMessage(), 'Connection refused') !== false) {
 		    ++$retry_attempt;
 		} else {
 		    throw $ex;
 		}
 	    } catch (PDOException $ex) {
 		echo 'PDOException: ' . $ex->getMessage() . PHP_EOL;
-		if (strpos($ex->getMessage(), 'server has gone away') !== false) {
+		if (strpos($ex->getMessage(), 'server has gone away') !== false || strpos($ex->getMessage(), 'Connection refused') !== false) {
 		    ++$retry_attempt;
 		} else {
 		    throw $ex;
