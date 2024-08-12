@@ -64,14 +64,14 @@ final class MySQLConnection implements ConnectionInterface {
 		}
 	    } catch (Exception $ex) {
 		echo 'Exception: ' . $ex->getMessage() . PHP_EOL;
-		if (strpos($ex->getMessage(), 'server has gone away') !== false || strpos($ex->getMessage(), 'Connection refused') !== false) {
+		if (strpos($ex->getMessage(), 'server has gone away') !== false || strpos($ex->getMessage(), 'Connection refused') !== false || strpos($ex->getMessage(), 'Call to undefined method') !== false ) {
 		    ++$retry_attempt;
 		} else {
 		    throw $ex;
 		}
 	    } catch (PDOException $ex) {
 		echo 'PDOException: ' . $ex->getMessage() . PHP_EOL;
-		if (strpos($ex->getMessage(), 'server has gone away') !== false || strpos($ex->getMessage(), 'Connection refused') !== false) {
+		if (strpos($ex->getMessage(), 'server has gone away') !== false || strpos($ex->getMessage(), 'Connection refused') !== false || strpos($ex->getMessage(), 'Call to undefined method') !== false ) {
 		    ++$retry_attempt;
 		} else {
 		    throw $ex;
